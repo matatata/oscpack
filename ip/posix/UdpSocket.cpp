@@ -56,6 +56,7 @@
 #include <cstring> // for memset
 #include <stdexcept>
 #include <vector>
+#include <atomic>
 
 #include "ip/PacketListener.h"
 #include "ip/TimerListener.h"
@@ -337,7 +338,7 @@ class SocketReceiveMultiplexer::Implementation{
 	std::vector< std::pair< PacketListener*, UdpSocket* > > socketListeners_;
 	std::vector< AttachedTimerListener > timerListeners_;
 
-	volatile bool break_;
+	std::atomic<bool> break_;
 	int breakPipe_[2]; // [0] is the reader descriptor and [1] the writer
 
 	double GetCurrentTimeMs() const
@@ -352,6 +353,7 @@ class SocketReceiveMultiplexer::Implementation{
 public:
     Implementation()
 	{
+        break_ = false;
 		if( pipe(breakPipe_) != 0 )
 			throw std::runtime_error( "creation of asynchronous break pipes failed\n" );
 	}
@@ -404,7 +406,6 @@ public:
 
     void Run()
 	{
-		break_ = false;
         char *data = 0;
         
         try{
@@ -599,4 +600,3 @@ void SocketReceiveMultiplexer::AsynchronousBreak()
 {
 	impl_->AsynchronousBreak();
 }
-
