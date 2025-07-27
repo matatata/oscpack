@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 4.0)
 PROJECT(TestOscpack)
 
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR})
