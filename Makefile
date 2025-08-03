@@ -114,6 +114,10 @@ else
 	$(CXX) -shared -Wl,-soname,$(LIBSONAME) -o $(LIBFILENAME) $(LIBOBJECTS) -lc
 endif
 
+$(LIBNAME).a:
+	# this is just a quick fix in order to get a static lib. Only tested on macos
+	ar rcs $(LIBNAME).a $(LIBOBJECTS)
+
 lib: $(LIBFILENAME)
 
 #Installs the library on a system global location
@@ -130,7 +134,7 @@ ifneq ($(UNAME), Darwin)
 endif
 
 #Installs the include/lib structure locally
-install-local: $(LIBFILENAME)
+install-local: $(LIBFILENAME) $(LIBNAME).a
 	@echo ""
 	@echo " Installing in local directory <$(INCLUDEDIR)>"
 	@echo "   > Creating symbolic link"
@@ -140,7 +144,7 @@ install-local: $(LIBFILENAME)
 	@mkdir -p oscpack/include/ip
 	@mkdir -p oscpack/include/osc
 	@echo "   > Copying files"
-	@mv $(LIBFILENAME) $(LIBSONAME) oscpack/lib
+	@mv $(LIBFILENAME) $(LIBSONAME) $(LIBNAME).a oscpack/lib
 	@cp ip/*.h oscpack/include/ip
 	@cp osc/*.h oscpack/include/osc
 	@echo ""
